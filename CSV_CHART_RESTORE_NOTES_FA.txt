@@ -1,0 +1,45 @@
+اصلاحیه نمایش نمودار از CSV واردشده و فیلتر فیلدهای OHLC
+
+این بسته قابلیت مشاهده نمودار بر اساس فایل CSV واردشده را به جریان ورود داده بازمی‌گرداند.
+
+امکانات:
+- پس از ورود موفق CSV، دکمه «دریافت نمودار بر اساس فایل CSV واردشده» نمایش داده می‌شود.
+- نمودار با نماد، تایم‌فریم و محدوده زمانی کندل‌های همان فایل باز می‌شود.
+- نیازی به تغییر مدل یا Migration دیتابیس نیست.
+- در صفحه نمودار می‌توان حالت کندلی کامل (OHLC) یا نمودار خطی Open، High، Low و Close را انتخاب کرد.
+- جست‌وجو بر اساس تاریخ یا مقدار فیلد انتخاب‌شده انجام می‌شود.
+- فیلتر تاریخ شروع و پایان، تایم‌فریم و تعداد کندل وجود دارد.
+- جدول کندل‌ها شامل زمان، Open، High، Low، Close و Tick Volume است.
+- RSI، MACD، میانگین متحرک، EMA، حجم و خطوط حمایت/مقاومت حفظ شده‌اند.
+
+فایل‌های موجود در بسته نسبت به ریشه پوشه MarketAnalysis:
+- marketdata/views.py
+- marketdata/services.py
+- marketdata/tests.py
+- templates/marketdata/import_csv.html
+- templates/marketdata/chart_detail.html
+- static/js/charts.js
+- static/css/app.css
+
+نصب در Windows:
+۱) در VS Code ترمینال سرور را با Ctrl+C متوقف کنید.
+۲) ZIP را در Downloads ذخیره کنید.
+۳) از ریشه پروژه در PowerShell ترمینال VS Code این دستور را اجرا کنید:
+
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\MarketAnalysis_CSV_Chart_Restore_Fix.zip" -DestinationPath "$env:USERPROFILE\MarketAnalysis" -Force
+
+۴) کنترل تنظیمات:
+python manage.py check
+
+۵) آزمون‌های بازار:
+python manage.py test marketdata
+
+۶) اجرای سامانه:
+python manage.py runserver
+
+نکات:
+- هیچ Migration جدیدی لازم نیست.
+- فایل .env، اطلاعات ورود، دیتابیس، حساب‌های کاربری و محیط .venv حفظ می‌شوند.
+- نمودار محدوده زمانی فایل را از کندل‌های ذخیره‌شده در دیتابیس می‌خواند؛ در صورت وجود داده تکراری در بازه، رکورد موجود دیتابیس نمایش داده می‌شود.
+- جدول حداکثر ۲۵۰ ردیف اولِ منطبق با جست‌وجو را رندر می‌کند تا مرورگر سبک بماند؛ تعداد کل نتایج فیلترشده نمایش داده می‌شود.
+- نمودار از TradingView Lightweight Charts از CDN بارگذاری می‌شود؛ مرورگر باید به unpkg.com یا cdn.jsdelivr.net دسترسی داشته باشد.

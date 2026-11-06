@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}نمودار {{ symbol.code }}{% endblock %}
+{% block head %}
+<script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js'"></script>
+{% endblock %}
+{% block content %}
+<div class="page-title chart-title">
+  <div>
+    <span class="eyebrow">MARKET CHART</span>
+    <h1>{{ symbol.code }} <small>{{ symbol.name }}</small></h1>
+    {% if csv_source %}
+      <p>نمایش داده‌های بازه فایل CSV واردشده{% if csv_filename %} · {{ csv_filename }}{% endif %}</p>
+    {% else %}
+      <p>نمودار بر اساس کندل‌های ذخیره‌شده در پایگاه داده نمایش داده می‌شود.</p>
+    {% endif %}
+  </div>
+  <div class="button-row chart-page-actions">
+    <a class="btn btn-outline" href="{% url 'chart_home' %}">انتخاب نماد دیگر</a>
+    <a class="btn btn-outline" href="{% url 'import_csv' %}">بازگشت به ورود CSV</a>
+  </div>
+</div>
+{% if csv_source %}
+<div class="alert alert-info chart-source-note">این نمودار به محدوده زمانی فایل واردشده محدود شده است. اگر کندل‌های همان زمان قبلاً در دیتابیس بوده‌اند، نسخه ذخیره‌شده دیتابیس نمایش داده می‌شود.</div>
+{% endif %}
+<section class="panel chart-panel">
+  <div class="chart-toolbar chart-toolbar-expanded">
+    <label>تایم‌فریم
+      <select id="timeframe">
+        {% for value,label in timeframes %}<option value="{{ value }}" {% if value == selected_timeframe %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>تعداد کندل
+      <select id="limit"><option value="500">۵۰۰</option><option value="1000" selected>۱۰۰۰</option><option value="3000">۳۰۰۰</option><option value="5000">۵۰۰۰</option></select>
+    </label>
+    <label>نمایش قیمت
+      <select id="price-field">
+        <option value="ohlc" selected>کندل کامل (OHLC)</option>
+        <option value="open">Open · قیمت بازشدن</option>
+        <option value="high">High · بیشترین قیمت</option>
+        <option value="low">Low · کمترین قیمت</option>
+        <option value="close">Close · قیمت بسته‌شدن</option>
+      </select>
+    </label>
+    <label>از تاریخ
+      <input id="date-from" type="date" value="{{ from_date }}">
+    </label>
+    <label>تا تاریخ
+      <input id="date-to" type="date" value="{{ to_date }}">
+    </label>
+    <button id="refresh-chart" class="btn btn-primary btn-sm" type="button">دریافت / به‌روزرسانی نمودار</button>
+    <label class="check-label"><input type="checkbox" id="show-sma" checked> میانگین ۲۰</label>
+    <label class="check-label"><input type="checkbox" id="show-ema"> EMA ۵۰</label>
+    <label class="check-label"><input type="checkbox" id="show-volume" checked> حجم</label>
+    <label class="check-label"><input type="checkbox" id="show-sr"> حمایت/مقاومت</label>
+  </div>
+  <div id="market-chart" class="market-chart" data-symbol="{{ symbol.code }}" data-from="{{ from_ts }}" data-to="{{ to_ts }}"></div>
+  <div id="chart-status" class="chart-status">در انتظار بارگذاری داده…</div>
+  <div class="chart-legend"><span id="chart-field-label">کندل قیمت OHLC</span><span>برای نمایش یک ستون قیمت، گزینه Open / High / Low / Close را انتخاب کن.</span></div>
+</section>
+<section class="panel chart-data-panel">
+  <div class="panel-heading chart-data-heading">
+    <div><h2>جست‌وجو در کندل‌های نمودار</h2><p class="muted tiny">جست‌وجو بر اساس تاریخ یا مقدار فیلد انتخاب‌شده انجام می‌شود.</p></div>
+    <label class="chart-search-label">جست‌وجو
+      <input id="candle-search" type="search" placeholder="مثلاً 3990 یا 2026-11-06" autocomplete="off">
+    </label>
+  </div>
+  <div id="candle-table-info" class="chart-status">پس از بارگذاری نمودار، ردیف‌های کندل نمایش داده می‌شوند.</div>
+  <div class="table-wrap chart-candle-table">
+    <table>
+      <thead><tr><th>تاریخ و ساعت</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Tick Volume</th></tr></thead>
+      <tbody id="candle-table-body"><tr><td colspan="6">هنوز داده‌ای بارگذاری نشده است.</td></tr></tbody>
+    </table>
+  </div>
+</section>
+<div class="two-col chart-lower">
+  <section class="panel"><h2>RSI (۱۴)</h2><div id="rsi-chart" class="indicator-chart"></div></section>
+  <section class="panel"><h2>MACD (۱۲، ۲۶، ۹)</h2><div id="macd-chart" class="indicator-chart"></div></section>
+</div>
+<p class="muted tiny">کتابخانه نمودار از CDN دریافت می‌شود؛ دسترسی مرورگر به unpkg.com یا jsdelivr.net لازم است. تعداد کندل‌ها در هر درخواست محدود است.</p>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/charts.js' %}"></script>{% endblock %}

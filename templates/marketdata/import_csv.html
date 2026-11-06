@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}ورود CSV{% endblock %}
+{% block content %}
+<div class="page-title">
+  <span class="eyebrow">DATA INGESTION</span>
+  <h1>ورود داده‌های قیمت از CSV</h1>
+  <p>فایل‌های خروجی Bars از MetaTrader 4 و MetaTrader 5 و همچنین CSV استاندارد پذیرفته می‌شوند. نیازی نیست فایل را دستی به UTF-8 تبدیل کنی؛ کدگذاری و جداکننده فایل به‌صورت خودکار شناسایی می‌شود.</p>
+</div>
+{% if result %}
+<section class="panel csv-import-success" aria-live="polite">
+  <div class="csv-success-copy">
+    <span class="eyebrow">CSV IMPORT COMPLETED</span>
+    <h2>فایل قیمت با موفقیت پردازش شد</h2>
+    <p><strong>{{ result.filename }}</strong> برای نماد <strong>{{ result.symbol.code }}</strong> و تایم‌فریم <strong>{{ result.timeframe }}</strong>.</p>
+    <div class="csv-import-stats">
+      <span><strong>{{ result.inserted_rows }}</strong><small>کندل جدید</small></span>
+      <span><strong>{{ result.duplicate_rows }}</strong><small>تکراری</small></span>
+      <span><strong>{{ result.invalid_rows }}</strong><small>نامعتبر</small></span>
+    </div>
+    {% if result.chart_url %}
+      <a class="btn btn-primary csv-chart-action" href="{{ result.chart_url }}">دریافت نمودار بر اساس فایل CSV واردشده <span aria-hidden="true">←</span></a>
+      <p class="muted tiny">نمودار با محدوده زمانی همین فایل باز می‌شود. در صفحه نمودار می‌توانی Open، High، Low یا Close را برای نمایش انتخاب کنی.</p>
+    {% else %}
+      <p class="alert alert-warning">در این فایل کندل معتبر قابل نمایش پیدا نشد؛ جزئیات را در گزارش ورود بررسی کن.</p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+<div class="two-col">
+  <section class="panel">
+    <h2>فایل جدید</h2>
+    <form method="post" enctype="multipart/form-data" class="form-card embedded">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="help-note">
+        <strong>فرمت‌های پشتیبانی‌شده:</strong>
+        <ul>
+          <li>MetaTrader 5: ستون‌های Date, Time, Open, High, Low, Close, Tick Vol, Vol, Spread</li>
+          <li>MetaTrader 4: ستون‌های Date, Time, Open, High, Low, Close, Volume</li>
+          <li>CSV استاندارد: timestamp, open, high, low, close, tick_volume</li>
+        </ul>
+        <strong>کدگذاری:</strong> UTF-8، UTF-8 BOM، UTF-16 و Windows ANSI به‌صورت خودکار تشخیص داده می‌شوند.
+        <br><strong>جداکننده:</strong> کاما، سمی‌کالن، تب و Pipe پشتیبانی می‌شود. فایل‌های دارای ردیف‌های جدیدتر در ابتدا نیز خودکار مرتب می‌شوند.
+        <br><strong>نکته:</strong> در فرم، نماد و تایم‌فریم مطابق فایل خروجی انتخاب شوند. زمان‌های بدون منطقه زمانی، با منطقه زمانی تنظیم‌شده برنامه تفسیر می‌شوند و از ساعت سرور بروکر به‌صورت خودکار جابه‌جا نمی‌شوند.
+        <br>حداکثر حجم فایل: ۲۰ مگابایت.
+      </div>
+      <button class="btn btn-primary">اعتبارسنجی و ورود کندل‌ها</button>
+    </form>
+    <div class="help-note">
+      <strong>نمونه فایل‌ها:</strong>
+      <ul>
+        <li><a class="text-link" href="{% static 'sample_mt5.csv' %}">دانلود نمونه MetaTrader 5</a></li>
+        <li><a class="text-link" href="{% static 'sample_mt4.csv' %}">دانلود نمونه MetaTrader 4</a></li>
+        <li><a class="text-link" href="{% static 'sample_candles.csv' %}">دانلود نمونه CSV استاندارد</a></li>
+      </ul>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>قواعد اعتبارسنجی</h2>
+    <ul class="check-list">
+      <li>تشخیص خودکار UTF-8، UTF-16 و کدگذاری‌های رایج Windows.</li>
+      <li>تشخیص جداکننده کاما، سمی‌کالن، تب یا Pipe.</li>
+      <li>پشتیبانی از قالب تاریخ MetaTrader مانند 2026.11.06 و زمان 10:00 یا 10:00:00.</li>
+      <li>در MT5، در صورت وجود Tick Vol از آن استفاده می‌شود؛ در MT4 ستون Volume به‌عنوان tick volume دریافت می‌شود.</li>
+      <li>ردیف‌های تکراری در فایل و کندل‌های موجود در دیتابیس دوباره وارد نمی‌شوند.</li>
+      <li>ترتیب زمانی فایل به‌صورت خودکار صعودی می‌شود.</li>
+      <li>مقادیر OHLC و حجم اعتبارسنجی می‌شوند و ردیف نامعتبر در گزارش مشخص می‌شود.</li>
+    </ul>
+  </section>
+</div>
+<section class="panel table-wrap">
+  <div class="panel-heading"><h2>تاریخچه ورود فایل‌ها</h2></div>
+  <table>
+    <thead><tr><th>فایل</th><th>نماد</th><th>کل</th><th>جدید</th><th>تکراری</th><th>نامعتبر</th><th>زمان</th></tr></thead>
+    <tbody>
+      {% for log in logs %}
+      <tr><td>{{ log.filename }}</td><td>{{ log.symbol|default:'—' }}</td><td>{{ log.total_rows }}</td><td>{{ log.inserted_rows }}</td><td>{{ log.duplicate_rows }}</td><td>{{ log.invalid_rows }}</td><td>{{ log.created_at|date:'Y/m/d H:i' }}</td></tr>
+      {% empty %}
+      <tr><td colspan="7">هنوز فایلی وارد نشده است.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+اصلاحیه ورود CSV برای MetaTrader 4 و MetaTrader 5
+
+این بسته فایل‌های زیر را در پوشه اصلی پروژه جایگزین می‌کند:
+- marketdata/services.py
+- marketdata/tests.py
+- templates/marketdata/import_csv.html
+و دو نمونه فایل به پوشه static اضافه می‌کند.
+
+امکانات:
+- تشخیص خودکار UTF-8، UTF-8 BOM، UTF-16 (با یا بدون BOM)، و Windows CP1252/CP1251/Latin-1.
+- تشخیص جداکننده کاما، سمی‌کالن، تب و Pipe.
+- پشتیبانی از ساختار MT5 شامل <DATE>, <TIME>, <OPEN>, <HIGH>, <LOW>, <CLOSE>, <TICKVOL>, <VOL>, <SPREAD>.
+- پشتیبانی از ساختار MT4 شامل Date, Time, Open, High, Low, Close, Volume.
+- پشتیبانی از فایل‌های بدون سرستون در قالب متداول MT4/MT5.
+- پشتیبانی از اعشار با نقطه یا کاما در فایل‌های سمی‌کالن‌دار.
+- مرتب‌سازی خودکار فایل‌های جدیدتر-اول.
+- جلوگیری از ورود کندل تکراری و اعتبارسنجی OHLC/حجم.
+- ثبت کدگذاری و جداکننده تشخیص‌داده‌شده در گزارش ورود.
+
+نصب:
+۱) سرور Django را با Ctrl+C متوقف کنید.
+۲) ZIP را دانلود و در پوشه Downloads ذخیره کنید.
+۳) در PowerShell ترمینال VS Code، از ریشه پروژه اجرا کنید:
+
+Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\MarketAnalysis_MT4_MT5_CSV_Fix.zip" -DestinationPath "$env:USERPROFILE\MarketAnalysis" -Force
+
+۴) آزمایش کنید:
+python manage.py check
+python manage.py test marketdata
+
+۵) سرور را اجرا کنید:
+python manage.py runserver
+
+نیازی به makemigrations یا migrate نیست؛ مدل‌های دیتابیس تغییر نکرده‌اند.
+فایل .env، حساب‌های کاربری، رمزها، داده‌های PostgreSQL و .venv دست‌نخورده می‌مانند.
+
+نکته زمان: تاریخ/زمان‌های بدون timezone به TIME_ZONE پروژه تفسیر می‌شوند. این سامانه منطقه زمانی سرور بروکر را حدس نمی‌زند یا به‌طور خودکار ساعت را جابه‌جا نمی‌کند. در صورت نیاز اختلاف ساعت بروکر باید جداگانه مشخص شود.
+
+توجه: این parser برای فایل‌های CSV خروجی Bars ساخته شده است؛ فایل‌های Ticks یا فایل‌های اختصاصی .hst/.fxt پشتیبانی نمی‌شوند. برای MT5 در بخش Export، Bars را انتخاب کنید.

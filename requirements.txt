@@ -1,0 +1,10 @@
+# نسخه‌های هم‌تراز با محیط آماده‌شده کاربر (Python 3.12 / Windows x64)
+Django==5.2.19
+djangorestframework==3.18.3
+django-filter==26.2
+psycopg[binary]==3.3.6
+python-dotenv>=1.2,<2
+numpy==2.5.4
+pandas==3.1.1
+Pillow==13.0.0
+openai==3.45.0

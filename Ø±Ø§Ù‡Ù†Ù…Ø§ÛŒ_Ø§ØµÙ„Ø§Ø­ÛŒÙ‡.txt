@@ -1,0 +1,17 @@
+اصلاحیه دو خطای MarketAnalysis
+
+این بسته فقط دو فایل را اصلاح می‌کند:
+1) MarketAnalysis/config/urls.py
+   مسیر جزئیات مطلب از slug ASCII-only به str تغییر کرده تا slug فارسی مانند «امتحانی» پذیرفته شود.
+2) MarketAnalysis/templates/marketdata/import_csv.html
+   تگ {% load static %} اضافه شده تا لینک فایل نمونه CSV بدون TemplateSyntaxError رندر شود.
+
+روش نصب:
+- فایل ZIP را در Downloads ذخیره کنید.
+- در PowerShell داخل پروژه اجرا کنید:
+  Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\MarketAnalysis_Bugfix_Patch.zip" -DestinationPath "$env:USERPROFILE\MarketAnalysis" -Force
+- سرور را با Ctrl+C متوقف و دوباره اجرا کنید:
+  python manage.py runserver
+- /operator/import-csv/ و سپس ثبت یک مطلب با عنوان فارسی را آزمایش کنید.
+
+این اصلاحیه به .env، .venv، دیتابیس، رمزها یا Migrationها دست نمی‌زند.

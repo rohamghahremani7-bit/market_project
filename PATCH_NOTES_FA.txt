@@ -1,0 +1,21 @@
+اصلاحیه مسیر مطالب فارسی و صفحه ورود CSV
+
+این بسته با مسیرهای درست در ریشه پروژه ساخته شده است؛ پوشه MarketAnalysis اضافی داخل ZIP وجود ندارد.
+
+فایل‌ها:
+- config/urls.py: مسیر جزئیات مطلب اکنون اسلاگ فارسی و انگلیسی را می‌پذیرد.
+- templates/marketdata/import_csv.html: تگ load static برای لینک فایل نمونه CSV اضافه شده است.
+
+نصب:
+1) سرور Django را در ترمینال VS Code با Ctrl+C متوقف کنید.
+2) ZIP را در Downloads ذخیره کنید.
+3) در ترمینال VS Code که در ریشه پروژه MarketAnalysis است اجرا کنید:
+   Expand-Archive -LiteralPath "$env:USERPROFILE\Downloads\MarketAnalysis_Unicode_And_CSV_Fix.zip" -DestinationPath "$env:USERPROFILE\MarketAnalysis" -Force
+4) بررسی کنید دستور زیر، خط re_path را نشان بدهد:
+   Select-String -Path .\config\urls.py -Pattern "re_path.*article_detail"
+5) اجرا کنید:
+   python manage.py check
+6) سرور را دوباره اجرا کنید:
+   python manage.py runserver
+
+این اصلاحیه دیتابیس، Migrationها، فایل .env، رمزها و پوشه .venv را تغییر نمی‌دهد.
